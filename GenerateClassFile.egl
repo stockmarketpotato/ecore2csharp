@@ -1,0 +1,53 @@
+using System;
+using System.Collections.Generic;
+
+namespace [%= getNamespace(eClass) %] {
+    public class [%= eClass.name %] [% if (eClass.eSuperTypes.size() > 0) { %] : [%= eClass.eSuperTypes.get(0).name %] [% } %] {
+        
+        [% // Generate attributes with correct type mapping %]
+        [% for (eAttribute in eClass.eAttributes) { %]
+        public [%= getCSharpType(eAttribute.eType) %] [%= eAttribute.name %] { get; set; }
+        [% } %]
+
+        [% // Generate references (associations) %]
+        [% for (eReference in eClass.eReferences) { %]
+        public [% if (eReference.upperBound == -1) { %]List<[%= eReference.eType.name %]>[% } else { %][%= eReference.eType.name %][% } %] [%= eReference.name %] { get; set; }
+        [% } %]
+
+        [% // Generate operations (methods) %]
+        [% for (eOperation in eClass.eOperations) { %]
+        public [%= getCSharpType(eOperation.eType) %] [%= eOperation.name %]( [% for (param in eOperation.eParameters) { %] [%= getCSharpType(param.eType) %] [%= param.name %] [% if (param != eOperation.eParameters.last()) { %], [% } %] [% } %] ) {
+            // Method logic
+        }
+        [% } %]
+
+        public [%= eClass.name %]() {
+            // TODO: implement constructor
+        }
+    }
+}
+
+[%
+operation getCSharpType(eType : EDataType) : String {
+    if (eType.name == "EString") return "string";
+    if (eType.name == "EInt") return "int";
+    if (eType.name == "EBoolean") return "bool";
+    if (eType.name == "EFloat") return "float";
+    if (eType.name == "EDouble") return "double";
+    if (eType.name == "ELong") return "long";
+    if (eType.name == "EShort") return "short";
+    if (eType.name == "EByte") return "byte";
+    return eType.name;
+}
+
+operation getNamespace(eClass : EClass) : String {
+    var packagePath = "";
+    var container = eClass.eContainer();
+    while (container != null and container.eClass.name == 'EPackage') {
+        packagePath = container.name + (packagePath != "" ? "." + packagePath : "");
+        container = container.eContainer();
+    }
+    return packagePath;
+}
+
+%]

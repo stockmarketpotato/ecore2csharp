@@ -1,0 +1,11 @@
+pre {
+	var classes = EClass.all.sortBy(c|c.name);
+}
+
+rule EClass2ClassDiagram 
+	transform c : EClass in: classes {
+	
+	template: "GenerateCSharp.egl"
+	target : c.name + ".cs"
+	
+}
