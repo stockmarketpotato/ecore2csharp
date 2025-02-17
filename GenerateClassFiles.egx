@@ -1,0 +1,16 @@
+rule GenerateClassFiles
+    transform eClass : EClass {
+    
+    template : "GenerateClassFile.egl"
+    target: "src-gen/" + getPackagePath(eClass) + "/" + eClass.name + ".cs"
+}
+
+operation getPackagePath(eClass : EClass) : String {
+    var packagePath = "";
+    var container = eClass.eContainer();
+    while (container != null and container.eClass.name == 'EPackage') {
+        packagePath = container.name + (packagePath != "" ? "/" + packagePath : "");
+        container = container.eContainer();
+    }
+    return packagePath;
+}
